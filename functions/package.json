@@ -1,18 +1,17 @@
 {
-  "name": "functions",
-  "description": "Cloud Functions for Firebase",
+  "name": "jobnotify-backend",
+  "description": "Backend server for JobNotify deployed on Render",
+  "main": "server.js",
   "scripts": {
-    "start": "firebase emulators:start --only functions,auth",
-    "lint": "eslint ."
+    "start": "node server.js"
   },
-  "main": "index.js",
   "engines": {
     "node": "20"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.0.0",
-    "firebase-admin": "^11.10.1",
-    "firebase-functions": "^4.4.1",
+    "express": "^4.18.2",
     "nodemailer": "^6.9.8"
   }
 }

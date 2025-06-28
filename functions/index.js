@@ -1,10 +1,11 @@
 require("dotenv").config();
-
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const express = require("express");
+const cors = require("cors");
 const nodemailer = require("nodemailer");
 
-admin.initializeApp();
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 const { GMAIL_USER, GMAIL_PASS } = process.env;
 
@@ -16,34 +17,39 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
-  console.log("📥 New user:", JSON.stringify(user, null, 2));
+// 🔥 POST route to trigger welcome email
+app.post("/sendWelcomeEmail", async (req, res) => {
+  const { email, name } = req.body;
 
-  const recipient = user?.email;
-  const displayName = user?.displayName || "there";
-
-  if (!recipient) {
-    console.warn("⚠️ Missing email on user:", user.uid);
-    return null;
+  if (!email || !name) {
+    return res.status(400).send("Missing email or name");
   }
 
   const mailOptions = {
     from: `"JobNotify" <${GMAIL_USER}>`,
-    to: recipient,
+    to: email,
     subject: "🎉 Welcome to JobNotify!",
     html: `
-      <h2>Hi ${displayName} 👋</h2>
+      <h2>Hi ${name} 👋</h2>
       <p>We’re glad to have you at <strong>JobNotify</strong>. Explore job alerts and stay notified!</p>
       <hr/>
       <p style="font-size:12px;color:gray;">If this wasn't you, feel free to ignore this email.</p>
     `,
   };
 
-  return transporter.sendMail(mailOptions)
-    .then(info => console.log("✅ Email sent:", info.response))
-    .catch(error => console.error("❌ Email failed:", error));
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent:", info.response);
+    res.status(200).send("Email sent!");
+  } catch (error) {
+    console.error("❌ Email failed:", error);
+    res.status(500).send("Failed to send email");
+  }
 });
 
-exports.helloTest = functions.https.onRequest((req, res) => {
-  res.send("👋 Hello from Firebase Emulator!");
+// 🛠️ Test route
+app.get("/hello", (req, res) => {
+  res.send("👋 Hello from Render!");
 });
+
+module.exports = app;
