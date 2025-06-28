@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { auth } from "../firebase"; // Ensure this path is correct in your project
+import { auth } from "./firebase"; // Ensure this path is correct in your project
 import axios from "axios";
 
 export default function SignUp() {
